@@ -34,7 +34,9 @@ jobs:
           $p = Start-Process -FilePath publish\AltairAssistant.exe -ArgumentList '--selftest' -PassThru
           if (-not $p.WaitForExit(240000)) { $p.Kill(); Write-Error 'Self-test timeout' }
           if (Test-Path publish\selftest.log) { Get-Content publish\selftest.log } else { Write-Host 'no selftest.log' }
-          Remove-Item publish\selftest.log -ErrorAction SilentlyContinue
+          if (Test-Path publish\crash.log) { Get-Content publish\crash.log }
+          Write-Host "exit code: $($p.ExitCode)"
+          Remove-Item publish\selftest.log, publish\crash.log -ErrorAction SilentlyContinue
           if ($p.ExitCode -ne 0) { exit 1 }
 
       - name: Package installer (Velopack)

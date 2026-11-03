@@ -11,6 +11,19 @@ public static class Program
     [STAThread]
     public static void Main(string[] args)
     {
+        AppDomain.CurrentDomain.UnhandledException += (_, e) => Crash(e.ExceptionObject as Exception);
+        try { Run(args); }
+        catch (Exception ex) { Crash(ex); throw; }
+    }
+
+    public static void Crash(Exception? ex)
+    {
+        try { File.AppendAllText(Path.Combine(AppContext.BaseDirectory, "crash.log"), $"{DateTime.Now:O} {ex}\n"); } catch { }
+        try { File.AppendAllText(Path.Combine(Path.GetTempPath(), "altair-crash.log"), $"{DateTime.Now:O} {ex}\n"); } catch { }
+    }
+
+    private static void Run(string[] args)
+    {
         // Установщик/обновления Velopack: обработка хуков установки — до любого UI
         VelopackApp.Build().Run();
 
@@ -41,6 +54,8 @@ public partial class App : Application
         DispatcherUnhandledException += (_, ex) =>
         {
             _host?.Write("Ошибка интерфейса: " + ex.Exception);
+            Program.Crash(ex.Exception);
+            if (SelfTest) { Shutdown(3); ex.Handled = true; return; }
             MessageBox.Show(ex.Exception.Message, "Altair", MessageBoxButton.OK, MessageBoxImage.Error);
             ex.Handled = true;
         };
