@@ -1,5 +1,6 @@
 using System.Threading;
 using System.Windows;
+using Altair.App.Views;
 using Velopack;
 
 namespace Altair.App;

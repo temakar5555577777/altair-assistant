@@ -145,11 +145,11 @@ public sealed class AppHost : IAsyncDisposable
 
         // Триггеры
         Scheduler = new Scheduler(Store.AllTriggers);
-        Scheduler.Fired += (cmd, _) => _ = Assistant.ExecuteAsync(cmd, null, cmd.Name, "schedule");
+        Scheduler.Fired += (cmd, trg) => { _ = Assistant.ExecuteAsync(cmd, null, cmd.Name, "schedule"); };
         Scheduler.Rebuild(DateTime.Now, Settings.LastSeen);
         Store.Changed += () => Scheduler.Rebuild(DateTime.Now);
         Events = new EventTriggerHub(Store.AllTriggers);
-        Events.Fired += (cmd, _, arg) =>
+        Events.Fired += (cmd, trg, arg) =>
         {
             var slots = new Dictionary<string, string> { ["event"] = arg ?? "" };
             _ = Assistant.ExecuteAsync(cmd, slots, cmd.Name, "event");

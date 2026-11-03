@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using Altair.Core.Models;
 using Trigger = Altair.Core.Models.Trigger;
+using SystemEvents = Altair.Core.Models.SystemEvents;
 using Altair.Core.Storage;
 using Microsoft.Win32;
 

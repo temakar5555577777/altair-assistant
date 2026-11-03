@@ -252,7 +252,7 @@ public sealed class HomePage : UserControl
                 return sp;
             }
             case "calendar":
-                return new Calendar { Background = Brushes.Transparent, BorderThickness = new Thickness(0) };
+                return new System.Windows.Controls.Calendar { Background = Brushes.Transparent, BorderThickness = new Thickness(0) };
             case "network":
             {
                 var t = Ui.Text("…");
