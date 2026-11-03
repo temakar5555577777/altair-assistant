@@ -72,4 +72,4 @@ jobs:
         run: |
           $v = "v1.0.${{ github.run_number }}"
           $notes = "Сборка $v. Установка: скачайте Altair.Assistant-win-Setup.exe и запустите. Самопроверка на Windows и модульные тесты пройдены."
-          gh release create $v (Get-ChildItem releases\*Setup.exe).FullName (Get-ChildItem releases\*.nupkg).FullName releases\releases.win.json releases\RELEASES --title "Altair Assistant $v" --notes $notes --latest
+          gh release create $v (Get-ChildItem releases -File).FullName --title "Altair Assistant $v" --notes $notes --latest
