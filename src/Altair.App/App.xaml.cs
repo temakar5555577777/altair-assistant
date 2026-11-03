@@ -1,6 +1,7 @@
 using System.Threading;
 using System.Windows;
 using Altair.App.Views;
+using Altair.Core.Storage;
 using Velopack;
 
 namespace Altair.App;
@@ -21,7 +22,7 @@ public static class Program
             return;
         }
 
-        var app = new App { StartMinimized = args.Contains("--tray") };
+        var app = new App { StartMinimized = args.Contains("--tray"), SelfTest = args.Contains("--selftest") };
         app.InitializeComponent();
         app.Run();
     }
@@ -30,6 +31,7 @@ public static class Program
 public partial class App : Application
 {
     public bool StartMinimized { get; init; }
+    public bool SelfTest { get; init; }
     private AppHost? _host;
     private MainWindow? _main;
 
@@ -44,8 +46,10 @@ public partial class App : Application
         };
         TaskScheduler.UnobservedTaskException += (_, ex) => { _host?.Write("Фоновая ошибка: " + ex.Exception.GetBaseException().Message); ex.SetObserved(); };
 
+        if (SelfTest) { AppPaths.Root = Path.Combine(Path.GetTempPath(), "AltairSelfTest"); }
         _host = new AppHost();
         ThemeManager.Apply(_host.Settings);
+        if (SelfTest) { Shutdown(await Altair.App.SelfTest.RunAsync(_host)); return; }
         Tray.Init(ShowMain, () => _ = ExitAsync());
 
         var splash = new SplashWindow();

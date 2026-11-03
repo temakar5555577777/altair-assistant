@@ -95,7 +95,7 @@ public sealed class AppHost : IAsyncDisposable
         _saveTimer.Stop(); _saveTimer.Start();
     }
 
-    public async Task StartAsync(IProgress<(string, double)> progress)
+    public async Task StartAsync(IProgress<(string, double)> progress, bool startSpeech = true)
     {
         // Команды: при первом запуске — встроенные паки
         Store.Load();
@@ -184,7 +184,7 @@ public sealed class AppHost : IAsyncDisposable
         Speech.Audio += (b, n) => { if (Settings.PluginOn("snapse")) Snap.Feed(b, n); };
         Snap.Snaps += n => { Write($"Snapse: {n} щелч."); Events.Raise(SystemEvents.Snapse, n.ToString()); };
         Tts.SpeakingChanged += speaking => Speech.Pause(speaking && !Settings.PluginOn("bargeIn"));
-        try { await Speech.StartAsync(progress, CancellationToken.None); }
+        if (startSpeech) try { await Speech.StartAsync(progress, CancellationToken.None); }
         catch (Exception ex) { Write("Распознавание не запущено: " + ex.Message); Tray.Notify("Микрофон", "Распознавание не запущено: " + ex.Message); }
 
         Events.Raise(SystemEvents.AssistantStarted);
@@ -298,7 +298,7 @@ public sealed class AppHost : IAsyncDisposable
             var w = new ConfirmWindow(req.Description, req.VoiceApproveForbidden);
             w.Decided += ok => tcs.TrySetResult(ok);
             w.Show();
-            ct.Register(() => _ui.BeginInvoke(() => { w.Close(); tcs.TrySetResult(false); }));
+            ct.Register(() => _ui.BeginInvoke(() => { w.CloseSafe(); tcs.TrySetResult(false); }));
             // Голосовой ответ: «разрешить»/«да» (кроме оплаты и паролей), «отклонить»/«нет»
             _ = Task.Run(async () =>
             {
@@ -307,7 +307,7 @@ public sealed class AppHost : IAsyncDisposable
                 bool yes = Assistant.IsYes(ans) || PhraseNormalizer.Normalize(ans).StartsWith("разреш");
                 if (yes && req.VoiceApproveForbidden) return;
                 tcs.TrySetResult(yes);
-                _ = _ui.BeginInvoke(() => w.Close());
+                _ = _ui.BeginInvoke(() => w.CloseSafe());
             });
         });
         return tcs.Task;

@@ -26,13 +26,24 @@ jobs:
         if: hashFiles('src/Altair.App/Altair.App.csproj') != ''
         run: dotnet publish src/Altair.App/Altair.App.csproj -c Release -r win-x64 --self-contained true -p:PublishReadyToRun=true -o publish
 
+      - name: Self-test on real Windows
+        if: hashFiles('src/Altair.App/Altair.App.csproj') != ''
+        shell: pwsh
+        timeout-minutes: 5
+        run: |
+          $p = Start-Process -FilePath publish\AltairAssistant.exe -ArgumentList '--selftest' -PassThru
+          if (-not $p.WaitForExit(240000)) { $p.Kill(); Write-Error 'Self-test timeout' }
+          if (Test-Path publish\selftest.log) { Get-Content publish\selftest.log } else { Write-Host 'no selftest.log' }
+          Remove-Item publish\selftest.log -ErrorAction SilentlyContinue
+          if ($p.ExitCode -ne 0) { exit 1 }
+
       - name: Package installer (Velopack)
         if: hashFiles('src/Altair.App/Altair.App.csproj') != ''
         shell: pwsh
         run: |
           dotnet tool install -g vpk
           $v = "1.0.${{ github.run_number }}"
-          vpk pack --packId Altair.Assistant --packVersion $v --packDir publish --mainExe AltairAssistant.exe --packTitle "Altair Assistant" --icon src/Altair.App/Assets/app.ico --outputDir releases
+          vpk pack --packId Altair.Assistant --packVersion $v --packDir publish --mainExe AltairAssistant.exe --packTitle "Altair Assistant" --runtime win-x64 --icon src/Altair.App/Assets/app.ico --outputDir releases
 
       - uses: actions/upload-artifact@v4
         if: hashFiles('releases/*') != ''

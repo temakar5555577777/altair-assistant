@@ -288,7 +288,7 @@ public sealed class MacroRecorder : DialogBase
     {
         if (_mods.Any(m => m is not (0x10 or 0xA0 or 0xA1))) return; // сочетания обрабатывает OnKey
         if (char.IsControl(c)) return;
-        Dispatcher.BeginInvoke(() => { Gap(); _text.Append(c); Show(); });
+        Dispatcher.BeginInvoke(() => { Gap(); _text.Append(c); UpdateLog(); });
     }
 
     private void OnKey(uint vk, bool down)
@@ -310,7 +310,7 @@ public sealed class MacroRecorder : DialogBase
         {
             Gap(); Flush();
             _steps.Add(parts.Count == 1 ? ActionStep.Of(ActionTypes.KeyPress, ("key", key), ("times", "1")) : ActionStep.Of(ActionTypes.KeyCombo, ("combo", spec)));
-            Show();
+            UpdateLog();
         });
     }
 
@@ -321,7 +321,7 @@ public sealed class MacroRecorder : DialogBase
         _text.Clear();
     }
 
-    private void Show() => _log.Text = $"Записано шагов: {_steps.Count}" + (_text.Length > 0 ? $"\nТекст: {_text}" : "");
+    private void UpdateLog() => _log.Text = $"Записано шагов: {_steps.Count}" + (_text.Length > 0 ? $"\nТекст: {_text}" : "");
 
     public static List<ActionStep> Record()
     {

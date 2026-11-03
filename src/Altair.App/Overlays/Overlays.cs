@@ -140,7 +140,7 @@ public sealed class IslandWindow : OverlayWindow
 public sealed class ConfirmWindow : OverlayWindow
 {
     public event Action<bool>? Decided;
-    private bool _done;
+    private bool _done, _closed;
 
     public ConfirmWindow(string description, bool critical)
     {
@@ -161,15 +161,17 @@ public sealed class ConfirmWindow : OverlayWindow
         };
         Content = Pill(body, 18);
         Loaded += (_, _) => PlaceTopCenter(70);
-        Closed += (_, _) => Finish(false);
+        Closed += (_, _) => { _closed = true; Finish(false); };
     }
+
+    public void CloseSafe() { if (!_closed) Close(); }
 
     private void Finish(bool ok)
     {
         if (_done) return;
         _done = true;
         Decided?.Invoke(ok);
-        if (IsLoaded) Dispatcher.BeginInvoke(Close);
+        if (!_closed) Dispatcher.BeginInvoke(CloseSafe);
     }
 }
 
