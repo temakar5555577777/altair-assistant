@@ -1,0 +1,47 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Tests (Core)
+        if: hashFiles('tests/Altair.Core.Tests/Altair.Core.Tests.csproj') != ''
+        run: dotnet test tests/Altair.Core.Tests/Altair.Core.Tests.csproj -c Release --logger "console;verbosity=normal"
+
+      - name: Build Windows layer
+        run: dotnet build src/Altair.Windows/Altair.Windows.csproj -c Release
+
+      - name: Publish app
+        if: hashFiles('src/Altair.App/Altair.App.csproj') != ''
+        run: dotnet publish src/Altair.App/Altair.App.csproj -c Release -r win-x64 --self-contained true -p:PublishReadyToRun=true -o publish
+
+      - name: Package installer (Velopack)
+        if: hashFiles('src/Altair.App/Altair.App.csproj') != ''
+        shell: pwsh
+        run: |
+          dotnet tool install -g vpk
+          $v = "1.0.${{ github.run_number }}"
+          vpk pack --packId Altair.Assistant --packVersion $v --packDir publish --mainExe AltairAssistant.exe --packTitle "Altair Assistant" --icon src/Altair.App/Assets/app.ico --outputDir releases
+
+      - uses: actions/upload-artifact@v4
+        if: hashFiles('releases/*') != ''
+        with:
+          name: Altair-Setup
+          path: releases/*Setup.exe
+
+      - uses: actions/upload-artifact@v4
+        if: hashFiles('releases/*') != ''
+        with:
+          name: Altair-Release-Files
+          path: releases/
