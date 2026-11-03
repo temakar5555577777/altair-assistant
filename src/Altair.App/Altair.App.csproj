@@ -12,6 +12,8 @@
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <SatelliteResourceLanguages>ru;en</SatelliteResourceLanguages>
+    <EnableDefaultApplicationDefinition>false</EnableDefaultApplicationDefinition>
+    <StartupObject>Altair.App.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Using Remove="System.Windows.Forms" />

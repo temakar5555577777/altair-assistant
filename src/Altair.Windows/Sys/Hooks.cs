@@ -23,6 +23,8 @@ public sealed class KeyboardHook : IDisposable
     private DateTime _lastTap = DateTime.MinValue; private uint _lastTapVk;
 
     public event Action<char>? Char;
+    /// <summary>Сырые нажатия (для записи макросов): vk, нажата/отпущена.</summary>
+    public event Action<uint, bool>? RawKey;
     public bool SuppressBound { get; set; } = true;
 
     public KeyboardHook()
@@ -47,6 +49,7 @@ public sealed class KeyboardHook : IDisposable
             if (!injected)
             {
                 bool repeat = isDown && _down.Contains(k.vkCode);
+                if (!repeat && (isDown || isUp)) RawKey?.Invoke(k.vkCode, isDown);
                 if (isDown) _down.Add(k.vkCode); else if (isUp) _down.Remove(k.vkCode);
                 bool handled = false;
                 foreach (var (key, down, up) in _bindings)

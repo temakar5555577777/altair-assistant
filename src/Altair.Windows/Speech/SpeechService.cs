@@ -78,7 +78,9 @@ public sealed class SpeechService : IDisposable
 
     public bool Running { get; private set; }
     public Model? MainModel => _model;
-    public void SetSpeakerModel(bool on) { }
+    public bool Paused => _paused;
+    /// <summary>Микрофон выключен пользователем (не путать с паузой на время ответа).</summary>
+    public bool UserMuted { get; set; }
 
     public async Task StartAsync(IProgress<(string, double)>? progress, CancellationToken ct)
     {
@@ -138,6 +140,7 @@ public sealed class SpeechService : IDisposable
 
     private void OnData(byte[] buf, int len)
     {
+        if (UserMuted) return;
         Audio?.Invoke(buf, len);
         if (_paused) return;
         string? final = null, partial = null; byte[]? pcm = null;
