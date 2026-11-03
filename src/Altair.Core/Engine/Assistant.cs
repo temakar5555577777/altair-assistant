@@ -52,7 +52,7 @@ public sealed class Assistant
     private void SetState(AssistantState s) { State = s; StateChanged?.Invoke(s); }
 
     /// <summary>Отделяет слово активации. Возвращает (было ли слово, остаток фразы).</summary>
-    public static (bool Wake, string Rest) StripWakeWord(string normalized, IEnumerable<string> wakeWords)
+    public static (bool Wake, string Remainder) StripWakeWord(string normalized, IEnumerable<string> wakeWords)
     {
         var tokens = PhraseNormalizer.Tokens(normalized);
         if (tokens.Length == 0) return (false, "");
@@ -91,7 +91,7 @@ public sealed class Assistant
         }
 
         string command;
-        if (pushToTalk || s.ListenMode == ListenMode.Always) command = StripWakeWord(text, s.WakeWords).Rest;
+        if (pushToTalk || s.ListenMode == ListenMode.Always) command = StripWakeWord(text, s.WakeWords).Remainder;
         else
         {
             var (wake, rest) = StripWakeWord(text, s.WakeWords);
