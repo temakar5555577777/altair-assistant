@@ -70,6 +70,26 @@ public static class SelfTest
         await Check("Системная сводка", async () => log.AppendLine("  " + await Altair.Windows.Actions.WindowsActions.SystemSummary("all")));
         await Check("Python/PowerShell", async () => { var r = await Shell.PowerShell("Write-Output 'привет'", default); if (!r.Output.Contains("привет")) throw new Exception(r.Output); });
 
+        await Check("Распознавание речи Vosk (модель + синтезированная фраза)", async () =>
+        {
+            const string model = "vosk-model-small-en-us-0.15";
+            await Altair.Windows.Speech.ModelManager.EnsureAsync(model, null, default);
+            var wav = Path.Combine(Path.GetTempPath(), "altair-selftest.wav");
+            using (var synth = new System.Speech.Synthesis.SpeechSynthesizer())
+            {
+                var en = synth.GetInstalledVoices().FirstOrDefault(v => v.VoiceInfo.Culture.TwoLetterISOLanguageName == "en");
+                if (en == null) { log.AppendLine("  (нет английского голоса Windows — пропуск)"); return; }
+                synth.SelectVoice(en.VoiceInfo.Name);
+                synth.SetOutputToWaveFile(wav, new System.Speech.AudioFormat.SpeechAudioFormatInfo(16000, System.Speech.AudioFormat.AudioBitsPerSample.Sixteen, System.Speech.AudioFormat.AudioChannel.Mono));
+                synth.Speak("open the browser and set volume to thirty");
+            }
+            var pcm = File.ReadAllBytes(wav)[44..];
+            using var m = new Vosk.Model(Altair.Windows.Speech.ModelManager.PathOf(model));
+            var text = Altair.Windows.Speech.SpeechService.RecognizeWith(m, pcm);
+            log.AppendLine("  распознано: " + text);
+            if (!text.Contains("browser") || !text.Contains("volume")) throw new Exception("Плохое распознавание: " + text);
+        });
+
         MainWindow? main = null;
         await Check("Главное окно", () => Sync(() => { main = new MainWindow(); main.Show(); }));
         foreach (var page in new[] { "Главная", "Команды", "Нейросеть", "ИИ-агент", "Расширения", "Оформление", "Настройки", "Журнал" })
