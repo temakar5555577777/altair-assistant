@@ -187,6 +187,15 @@ public sealed class AppHost : IAsyncDisposable
         if (startSpeech) try { await Speech.StartAsync(progress, CancellationToken.None); }
         catch (Exception ex) { Write("Распознавание не запущено: " + ex.Message); Tray.Notify("Микрофон", "Распознавание не запущено: " + ex.Message); }
 
+        // Автозапуск: настройка «Запускать вместе с Windows» включена по умолчанию — применяем её реально
+        try
+        {
+            var exe = Environment.ProcessPath;
+            if (exe != null && !Settings.ElevatedAutostart && !exe.Contains(Path.GetTempPath(), StringComparison.OrdinalIgnoreCase))
+                Altair.Windows.Sys.Shell.SetAutostart(Settings.StartWithWindows, exe);
+        }
+        catch (Exception ex) { Write("Автозапуск: " + ex.Message); }
+
         Events.Raise(SystemEvents.AssistantStarted);
         Write("Altair запущен");
     }
