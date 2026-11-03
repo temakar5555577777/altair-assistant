@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Altair.Windows.Native;
 
-internal static partial class Win32
+public static partial class Win32
 {
     // ---------- Ввод ----------
     public const int INPUT_MOUSE = 0, INPUT_KEYBOARD = 1;
