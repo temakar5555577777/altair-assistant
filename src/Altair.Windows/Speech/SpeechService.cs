@@ -113,6 +113,7 @@ public sealed class SpeechService : IDisposable
 
     private void ResetRecognizer()
     {
+        if (_model == null) return; // распознавание не запущено (нет модели/микрофона)
         lock (_gate)
         {
             _rec?.Dispose();
@@ -130,10 +131,10 @@ public sealed class SpeechService : IDisposable
     public void PushToTalk(bool down)
     {
         if (down) { ResetRecognizer(); _pushToTalk = true; return; }
-        if (!_pushToTalk) return;
+        if (!_pushToTalk || _rec == null) return;
         _pushToTalk = false;
         string json; byte[] pcm;
-        lock (_gate) { json = _rec!.FinalResult(); pcm = _pcm.ToArray(); }
+        lock (_gate) { json = _rec.FinalResult(); pcm = _pcm.ToArray(); }
         _ = EmitAsync(json, pcm, true);
         ResetRecognizer();
     }
