@@ -49,7 +49,7 @@ public sealed class MainWindow : Window
             _nav.Children.Add(rb);
         }
 
-        var status = new TextBlock { Style = (Style)Application.Current.Resources["Muted"], Margin = new Thickness(14, 18, 8, 0) };
+        var status = new TextBlock { Style = (Style)Application.Current.Resources["MutedText"], Margin = new Thickness(14, 18, 8, 0) };
         _nav.Children.Add(status);
         void UpdateStatus()
         {

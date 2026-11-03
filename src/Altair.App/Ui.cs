@@ -14,7 +14,7 @@ public static class Ui
     public static TextBlock H1(string t) => new() { Text = t, Style = (Style)Application.Current.Resources["H1"] };
     public static TextBlock H2(string t) => new() { Text = t, Style = (Style)Application.Current.Resources["H2"] };
     public static TextBlock Text(string t, double size = 14) => new() { Text = t, FontSize = size, Margin = new Thickness(0, 0, 0, 6) };
-    public static TextBlock Hint(string t) => new() { Text = t, Style = (Style)Application.Current.Resources["Muted"], Margin = new Thickness(0, 0, 0, 8) };
+    public static TextBlock Hint(string t) => new() { Text = t, Style = (Style)Application.Current.Resources["MutedText"], Margin = new Thickness(0, 0, 0, 8) };
 
     public static Border Card(params UIElement[] children)
     {
