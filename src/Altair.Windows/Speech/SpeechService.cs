@@ -68,6 +68,8 @@ public sealed class SpeechService : IDisposable
     public event Action<Utterance>? Recognized;
     public event Action<float>? Level;
     public event Action<string>? Log;
+    /// <summary>Сырой звук микрофона (для Snapse и записи голосового профиля).</summary>
+    public event Action<byte[], int>? Audio;
 
     /// <summary>Подсказка для облачного распознавания (фразы команд повышают точность).</summary>
     public Func<string>? VocabularyHint { get; set; }
@@ -75,6 +77,8 @@ public sealed class SpeechService : IDisposable
     public SpeechService(Func<AppSettings> settings) => _settings = settings;
 
     public bool Running { get; private set; }
+    public Model? MainModel => _model;
+    public void SetSpeakerModel(bool on) { }
 
     public async Task StartAsync(IProgress<(string, double)>? progress, CancellationToken ct)
     {
@@ -134,6 +138,7 @@ public sealed class SpeechService : IDisposable
 
     private void OnData(byte[] buf, int len)
     {
+        Audio?.Invoke(buf, len);
         if (_paused) return;
         string? final = null, partial = null; byte[]? pcm = null;
         lock (_gate)

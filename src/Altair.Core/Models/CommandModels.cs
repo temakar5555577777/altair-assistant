@@ -136,11 +136,13 @@ public static class SystemEvents
     public const string InternetRestored = "net.restored";
     public const string WifiConnected = "net.wifi";
     public const string AssistantStarted = "assistant.started";
+    public const string Snapse = "snapse"; // аргумент — число щелчков (1/2/3)
+    public const string Gesture = "hotkey.double";
 
     public static readonly string[] All =
     {
         AppStarted, AppClosed, HeadphonesConnected, HeadphonesDisconnected, AudioDeviceChanged,
         PowerPlugged, PowerUnplugged, BatteryBelow, UserAway, UserBack, SessionLocked, SessionUnlocked,
-        InternetLost, InternetRestored, WifiConnected, AssistantStarted
+        InternetLost, InternetRestored, WifiConnected, AssistantStarted, Snapse
     };
 }

@@ -207,6 +207,16 @@ public sealed class AppSettings
     public int Desks { get; set; } = 1;
 
     public bool StartWithWindows { get; set; } = true;
+    public bool ElevatedAutostart { get; set; }
+    public string UpdateUrl { get; set; } = "";
+    public double WeatherLat { get; set; } = 43.2389;
+    public double WeatherLon { get; set; } = 76.8897;
+    public string WeatherCity { get; set; } = "Алматы";
+    public Dictionary<string, string> Snippets { get; set; } = new() { [";дата"] = "{date}", [";почта"] = "example@mail.com" };
+    public List<string> DocFolders { get; set; } = new();
+    public string? AwayLockDevice { get; set; }
+    public int BreakWorkMinutes { get; set; } = 50;
+    public string Notes { get; set; } = "";
     public bool GameMode { get; set; }
     public DateTime LastSeen { get; set; } = DateTime.Now;
 
