@@ -61,7 +61,7 @@ public partial class App : Application
         };
         TaskScheduler.UnobservedTaskException += (_, ex) => { _host?.Write("Фоновая ошибка: " + ex.Exception.GetBaseException().Message); ex.SetObserved(); };
 
-        if (SelfTest) { AppPaths.Root = Path.Combine(Path.GetTempPath(), "AltairSelfTest"); }
+        if (SelfTest) { AppPaths.Root = Path.Combine(Path.GetTempPath(), "AltairSelfTest"); File.WriteAllText(Path.Combine(AppContext.BaseDirectory, "selftest.live.log"), "OnStartup\n"); }
         _host = new AppHost();
         ThemeManager.Apply(_host.Settings);
         if (SelfTest) { Shutdown(await Altair.App.SelfTest.RunAsync(_host)); return; }

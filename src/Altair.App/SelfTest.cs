@@ -18,11 +18,14 @@ public static class SelfTest
     public static async Task<int> RunAsync(AppHost host)
     {
         var log = new StringBuilder();
+        var live = Path.Combine(AppContext.BaseDirectory, "selftest.live.log");
+        File.WriteAllText(live, "");
         int failures = 0;
         async Task Check(string name, Func<Task> f)
         {
-            try { await f(); log.AppendLine("PASS " + name); }
-            catch (Exception ex) { failures++; log.AppendLine($"FAIL {name}: {ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}"); }
+            File.AppendAllText(live, "START " + name + Environment.NewLine);
+            try { await f(); log.AppendLine("PASS " + name); File.AppendAllText(live, "PASS " + name + Environment.NewLine); }
+            catch (Exception ex) { failures++; var m = $"FAIL {name}: {ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}"; log.AppendLine(m); File.AppendAllText(live, m + Environment.NewLine); }
         }
         Task Sync(Action a) { a(); return Task.CompletedTask; }
 
