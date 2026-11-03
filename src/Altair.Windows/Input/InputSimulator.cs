@@ -72,7 +72,7 @@ public static class InputSimulator
         var vks = parts.Select(ParseKey).ToArray();
         var list = new List<INPUT>();
         foreach (var vk in vks) list.Add(Key(vk, false));
-        foreach (var vk in vks.Reverse()) list.Add(Key(vk, true));
+        foreach (var vk in Enumerable.Reverse(vks)) list.Add(Key(vk, true));
         Send(list.ToArray());
     }
 
