@@ -15,7 +15,7 @@ public sealed class CommandBuilder
     {
         var actions = string.Join("\n", ActionTypes.Catalog.Select(a =>
             $"{a.Type} — {a.Title}" + (a.Args.Length > 0 ? " [" + string.Join(", ", a.Args.Select(x => x.Key)) + "]" : "")));
-        return $$"""
+        return $$$"""
             Ты генерируешь голосовую команду для ассистента Windows. Верни ТОЛЬКО JSON:
             {"name":"…","phrases":["фраза 1","фраза 2","фраза 3"],"actions":[{"type":"…","args":{"…":"…"}}],
              "responses":{"items":[{"text":"…","weight":1}]}}
@@ -24,7 +24,7 @@ public sealed class CommandBuilder
             Условие: {"type":"flow.if","condition":"{hour} >= 22","then":[…],"else":[…]}.
             Повтор: {"type":"flow.repeat","args":{"count":"3"},"then":[…]}.
             Доступные действия:
-            {{actions}}
+            {{{actions}}}
             """;
     }
 
